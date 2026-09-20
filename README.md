@@ -6,6 +6,12 @@ Distilled from a production collector I have run inside my advisory practice sin
 
 **If you came here for the bugs:** [DEVELOPMENT-NOTES.md](DEVELOPMENT-NOTES.md) documents the four failures found in the first hour of running this, none of which raised an error.
 
+## Two tools
+
+**`euraxess_ethical_collector.py`** collects adverts and writes a CSV.
+
+**`eligibility_classifier.py`** reads those adverts back from the local cache and sorts each one's eligibility language into four buckets, using rules rather than a confidence score. It answers what the page states about nationality, not whether you personally may apply. Across the first 57-position run, all 57 pages were silent on nationality — which is the honest answer, not a shortcut to "open to everyone".
+
 ## What it does
 
 Reads a country's listings on EURAXESS (PhD, postdoc and research positions) and writes a CSV with labelled fields.
@@ -35,7 +41,12 @@ python euraxess_ethical_collector.py --country canada --pages 3 --out canada.csv
 
 # Two countries in one command
 python euraxess_ethical_collector.py --country canada --country netherlands --pages 3 --out cross_continent.csv
+
+# Classify the eligibility language of what you just collected
+python eligibility_classifier.py --input cross_continent.csv --out cross_continent_classified.csv
 ```
+
+The classifier makes no network requests. It reads the advert pages the collector already cached, so it runs in seconds and never asks the source twice.
 
 Expected wall-clock time: about 20-40 minutes for 30-60 adverts across two countries, mostly spent politely waiting between fetches.
 
